@@ -37,13 +37,13 @@ def draw(canvas):
     coroutines.append(fire(canvas, canvas_height / 2, canvas_width / 2))
 
     while True:
-        try:
-            for coroutine in coroutines:
+        for index, coroutine in enumerate(coroutines):
+            try:
                 coroutine.send(None)
-                canvas.refresh()
-            time.sleep(TIC_TIMEOUT)
-        except StopIteration:
-            coroutines.pop()
+            except StopIteration:
+                coroutines.pop(index)
+        canvas.refresh()
+        time.sleep(TIC_TIMEOUT)
 
 
 async def blink(canvas, row, column, symbol, delay):
