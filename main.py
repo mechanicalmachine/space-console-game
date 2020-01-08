@@ -20,7 +20,8 @@ def draw(canvas):
         row = random.randint(2, canvas_height-2)
         column = random.randint(2, canvas_width-2)
         symbol = random.choice('+*.:')
-        coroutines.append(blink(canvas, row, column, symbol))
+        delay = random.randint(1, 10)
+        coroutines.append(blink(canvas, row, column, symbol, delay))
 
     # add spaceship
     frames_filenames = ['rocket_frame_1.txt', 'rocket_frame_2.txt']
@@ -45,8 +46,8 @@ def draw(canvas):
             coroutines.pop()
 
 
-async def blink(canvas, row, column, symbol='*'):
-    for _ in range(random.randint(1, 10)):
+async def blink(canvas, row, column, symbol, delay):
+    for _ in range(delay):
         await asyncio.sleep(0)
     while True:
         canvas.addstr(row, column, symbol, curses.A_DIM)
