@@ -7,6 +7,7 @@ from os import path
 from curses_tools import draw_frame, read_controls, get_frame_size
 
 TIC_TIMEOUT = 0.1
+STARS_AMOUNT = 100
 
 
 def draw(canvas):
@@ -16,7 +17,7 @@ def draw(canvas):
     coroutines = []
 
     # add stars
-    for _ in range(1, 100):
+    for _ in range(1, STARS_AMOUNT):
         row = random.randint(2, canvas_height-2)
         column = random.randint(2, canvas_width-2)
         symbol = random.choice('+*.:')
