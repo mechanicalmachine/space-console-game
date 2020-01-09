@@ -38,7 +38,7 @@ def draw(canvas):
     coroutines.append(fire(canvas, canvas_height / 2, canvas_width / 2))
 
     while True:
-        for index, coroutine in enumerate(coroutines):
+        for index, coroutine in enumerate(coroutines.copy()):
             try:
                 coroutine.send(None)
             except StopIteration:
