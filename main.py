@@ -40,9 +40,7 @@ def draw(canvas):
     coroutines.append(fire(canvas, canvas_height / 2, canvas_width / 2))
 
     # add garbage
-    path_to_garbage_frames = os.path.join('animation', 'garbage')
-    # TODO garbage_frames_filenames move to separate func
-    garbage_frames_filenames = [os.path.join(path_to_garbage_frames, f) for f in os.listdir(path_to_garbage_frames) if os.path.isfile(os.path.join(path_to_garbage_frames, f))]
+    garbage_frames_filenames = _get_frames_paths('animation', 'garbage')
     for index, frame_filename in enumerate(garbage_frames_filenames):
         garbage_frame = _get_spaceship_frame(frame_filename)
         coroutines.append(fly_garbage(canvas, 30*index, garbage_frame))
@@ -149,6 +147,10 @@ def _get_related_filepath(dirname, filename):
 def _get_spaceship_frame(frame_name):
     with open(frame_name) as frame:
         return frame.read()
+
+
+def _get_frames_paths(*args):
+    return [os.path.join(*args, f) for f in os.listdir(os.path.join(*args)) if os.path.isfile(os.path.join(*args, f))]
 
 
 if __name__ == '__main__':
