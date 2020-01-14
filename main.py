@@ -29,6 +29,7 @@ def draw(canvas):
     frames_filenames = ['rocket_frame_1.txt', 'rocket_frame_2.txt']
     animation_dir = 'animation'
     spaceship_frames = []
+    # TODO use func like in adding garbage
     for filename in frames_filenames:
         frame_path = _get_related_filepath(animation_dir, filename)
         spaceship_frame = _get_spaceship_frame(frame_path)
@@ -37,6 +38,14 @@ def draw(canvas):
 
     # add fire
     coroutines.append(fire(canvas, canvas_height / 2, canvas_width / 2))
+
+    # add garbage
+    path_to_garbage_frames = os.path.join('animation', 'garbage')
+    # TODO garbage_frames_filenames move to separate func
+    garbage_frames_filenames = [os.path.join(path_to_garbage_frames, f) for f in os.listdir(path_to_garbage_frames) if os.path.isfile(os.path.join(path_to_garbage_frames, f))]
+    for index, frame_filename in enumerate(garbage_frames_filenames):
+        garbage_frame = _get_spaceship_frame(frame_filename)
+        coroutines.append(fly_garbage(canvas, 30*index, garbage_frame))
 
     while True:
         for index, coroutine in enumerate(coroutines.copy()):
