@@ -26,13 +26,10 @@ def draw(canvas):
         coroutines.append(blink(canvas, row, column, symbol, delay))
 
     # add spaceship
-    frames_filenames = ['rocket_frame_1.txt', 'rocket_frame_2.txt']
-    animation_dir = 'animation'
     spaceship_frames = []
-    # TODO use func like in adding garbage
-    for filename in frames_filenames:
-        frame_path = _get_related_filepath(animation_dir, filename)
-        spaceship_frame = _get_spaceship_frame(frame_path)
+    spaceship_frames_filenames = _get_frames_paths('animation', 'rocket')
+    for filename in spaceship_frames_filenames:
+        spaceship_frame = _get_spaceship_frame(filename)
         spaceship_frames.append(spaceship_frame)
     coroutines.append(animate_spaceship(canvas, canvas_height / 2, canvas_width / 2 - 2, spaceship_frames))
 
@@ -139,9 +136,9 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
         draw_frame(canvas, row, column, garbage_frame, negative=True)
         row += speed
 
-
-def _get_related_filepath(dirname, filename):
-    return path.join(dirname, filename)
+#
+# def _get_related_filepath(dirname, filename):
+#     return path.join(dirname, filename)
 
 
 def _get_spaceship_frame(frame_name):
