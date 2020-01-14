@@ -3,7 +3,6 @@ import random
 import time
 import curses
 import asyncio
-from os import path
 
 from curses_tools import draw_frame, read_controls, get_frame_size
 
@@ -135,10 +134,6 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
         await asyncio.sleep(0)
         draw_frame(canvas, row, column, garbage_frame, negative=True)
         row += speed
-
-#
-# def _get_related_filepath(dirname, filename):
-#     return path.join(dirname, filename)
 
 
 def _get_spaceship_frame(frame_name):
