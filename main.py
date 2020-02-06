@@ -46,7 +46,7 @@ async def async_draw(canvas, canvas_width):
     while True:
         # add garbage
         garbage_frames_filenames1 = _get_frames_paths('animation', 'garbage')
-        garbage_frame1 = _get_spaceship_frame(garbage_frames_filenames1[0])
+        garbage_frame1 = _get_spaceship_frame(random.choice(garbage_frames_filenames1))
         await fill_orbit_with_garbage(canvas, garbage_frame1, canvas_width)
 
         for index, coroutine in enumerate(COROUTINES.copy()):
@@ -64,25 +64,25 @@ async def fill_orbit_with_garbage(canvas, garbage_frame, canvas_width):
     await asyncio.sleep(0.1)
 
 
-async def blink(canvas, row, column, symbol, delay):
-    for _ in range(delay):
+async def sleep(tics=1):
+    for _ in range(tics):
         await asyncio.sleep(0)
+
+
+async def blink(canvas, row, column, symbol, delay):
+    await sleep(delay)
     while True:
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        for _ in range(20):
-            await asyncio.sleep(0)
+        await sleep(20)
 
         canvas.addstr(row, column, symbol)
-        for _ in range(3):
-            await asyncio.sleep(0)
+        await sleep(3)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        for _ in range(5):
-            await asyncio.sleep(0)
+        await sleep(5)
 
         canvas.addstr(row, column, symbol)
-        for _ in range(3):
-            await asyncio.sleep(0)
+        await sleep(3)
 
 
 async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
