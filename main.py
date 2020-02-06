@@ -8,13 +8,15 @@ from curses_tools import draw_frame, read_controls, get_frame_size
 
 TIC_TIMEOUT = 0.1
 STARS_AMOUNT = 100
+COROUTINES = []
 
 
 def draw(canvas):
+    global COROUTINES
+
     canvas.nodelay(True)
     canvas.border()
     canvas_height, canvas_width = canvas.getmaxyx()
-    coroutines = []
 
     # add stars
     for _ in range(1, STARS_AMOUNT):
@@ -22,7 +24,7 @@ def draw(canvas):
         column = random.randint(2, canvas_width-2)
         symbol = random.choice('+*.:')
         delay = random.randint(1, 10)
-        coroutines.append(blink(canvas, row, column, symbol, delay))
+        COROUTINES.append(blink(canvas, row, column, symbol, delay))
 
     # add spaceship
     spaceship_frames = []
@@ -30,25 +32,36 @@ def draw(canvas):
     for filename in spaceship_frames_filenames:
         spaceship_frame = _get_spaceship_frame(filename)
         spaceship_frames.append(spaceship_frame)
-    coroutines.append(animate_spaceship(canvas, canvas_height / 2, canvas_width / 2 - 2, spaceship_frames))
+    COROUTINES.append(animate_spaceship(canvas, canvas_height / 2, canvas_width / 2 - 2, spaceship_frames))
 
     # add fire
-    coroutines.append(fire(canvas, canvas_height / 2, canvas_width / 2))
+    COROUTINES.append(fire(canvas, canvas_height / 2, canvas_width / 2))
 
-    # add garbage
-    garbage_frames_filenames = _get_frames_paths('animation', 'garbage')
-    for index, frame_filename in enumerate(garbage_frames_filenames):
-        garbage_frame = _get_spaceship_frame(frame_filename)
-        coroutines.append(fly_garbage(canvas, 30*index, garbage_frame))
+    loop = asyncio.get_event_loop()
+    loop.create_task(async_draw(canvas, canvas_width))
+    loop.run_forever()
 
+
+async def async_draw(canvas, canvas_width):
     while True:
-        for index, coroutine in enumerate(coroutines.copy()):
+        # add garbage
+        garbage_frames_filenames1 = _get_frames_paths('animation', 'garbage')
+        garbage_frame1 = _get_spaceship_frame(garbage_frames_filenames1[0])
+        await fill_orbit_with_garbage(canvas, garbage_frame1, canvas_width)
+
+        for index, coroutine in enumerate(COROUTINES.copy()):
             try:
                 coroutine.send(None)
             except StopIteration:
-                coroutines.pop(index)
+                COROUTINES.pop(index)
         canvas.refresh()
         time.sleep(TIC_TIMEOUT)
+
+
+async def fill_orbit_with_garbage(canvas, garbage_frame, canvas_width):
+    rand_garbage_column = random.randint(1, canvas_width - 1)
+    COROUTINES.append(fly_garbage(canvas, rand_garbage_column, garbage_frame))
+    await asyncio.sleep(0.1)
 
 
 async def blink(canvas, row, column, symbol, delay):
@@ -120,7 +133,7 @@ async def animate_spaceship(canvas, start_row, start_column, frames):
 
 
 async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
-    """Animate garbage, flying from top to bottom. Сolumn position will stay same, as specified on start."""
+    """Animate garbage, flying from top to bottom. Сolumn position will stay the same, as specified on start."""
 
     rows_number, columns_number = canvas.getmaxyx()
 
