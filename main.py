@@ -45,9 +45,9 @@ def draw(canvas):
 async def async_draw(canvas, canvas_width):
     while True:
         # add garbage
-        garbage_frames_filenames1 = _get_frames_paths('animation', 'garbage')
-        garbage_frame1 = _get_spaceship_frame(random.choice(garbage_frames_filenames1))
-        await fill_orbit_with_garbage(canvas, garbage_frame1, canvas_width)
+        garbage_frames_filenames = _get_frames_paths('animation', 'garbage')
+        garbage_frame = _get_spaceship_frame(random.choice(garbage_frames_filenames))
+        await fill_orbit_with_garbage(canvas, garbage_frame, canvas_width)
 
         for index, coroutine in enumerate(COROUTINES.copy()):
             try:
