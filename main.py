@@ -9,6 +9,7 @@ from curses_tools import draw_frame, read_controls, get_frame_size
 TIC_TIMEOUT = 0.1
 STARS_AMOUNT = 100
 COROUTINES = []
+SPACESHIP_FRAME = ''
 
 
 def draw(canvas):
