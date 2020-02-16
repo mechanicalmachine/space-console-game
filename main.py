@@ -5,6 +5,7 @@ import curses
 import asyncio
 
 from curses_tools import draw_frame, read_controls, get_frame_size
+from physics import update_speed
 
 TIC_TIMEOUT = 0.1
 STARS_AMOUNT = 100
@@ -123,11 +124,21 @@ async def run_spaceship(canvas, start_row, start_column, frames):
     row, column = start_row, start_column
     frame_rows, frame_columns = get_frame_size(frames[0])
     canvas_rows, canvas_column = canvas.getmaxyx()
+    row_speed, column_speed = 0, 0
     while True:
         rows_direction, columns_direction, space_pressed = read_controls(canvas)
 
-        row = max(1, min(row + rows_direction, canvas_rows - frame_rows - 1))
-        column = max(1, min(column + columns_direction, canvas_column - frame_columns - 1))
+        row_speed, column_speed = update_speed(row_speed, column_speed, rows_direction, columns_direction)
+
+        row = max(1, min(row + row_speed, canvas_rows - frame_rows - 1))
+        column = max(1, min(column + column_speed, canvas_column - frame_columns - 1))
+
+        previous_spaceship_frame = SPACESHIP_FRAME
+
+        draw_frame(canvas, row, column, SPACESHIP_FRAME, negative=False)
+        await asyncio.sleep(0)
+
+        draw_frame(canvas, row, column, previous_spaceship_frame, negative=True)
 
 
 async def animate_spaceship(frames):
