@@ -33,10 +33,13 @@ def draw(canvas):
     for filename in spaceship_frames_filenames:
         spaceship_frame = _get_spaceship_frame(filename)
         spaceship_frames.append(spaceship_frame)
-    COROUTINES.append(animate_spaceship(canvas, canvas_height / 2, canvas_width / 2 - 2, spaceship_frames))
+    COROUTINES.append(run_spaceship(canvas, canvas_height / 2, canvas_width / 2 - 2, spaceship_frames))
 
     # add fire
     COROUTINES.append(fire(canvas, canvas_height / 2, canvas_width / 2))
+
+    # change spaceship frame
+    COROUTINES.append(animate_spaceship(spaceship_frames))
 
     loop = asyncio.get_event_loop()
     loop.create_task(async_draw(canvas, canvas_width))
@@ -116,7 +119,7 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
         column += columns_speed
 
 
-async def animate_spaceship(canvas, start_row, start_column, frames):
+async def run_spaceship(canvas, start_row, start_column, frames):
     row, column = start_row, start_column
     frame_rows, frame_columns = get_frame_size(frames[0])
     canvas_rows, canvas_column = canvas.getmaxyx()
@@ -126,11 +129,16 @@ async def animate_spaceship(canvas, start_row, start_column, frames):
         row = max(1, min(row + rows_direction, canvas_rows - frame_rows - 1))
         column = max(1, min(column + columns_direction, canvas_column - frame_columns - 1))
 
+
+async def animate_spaceship(frames):
+    global SPACESHIP_FRAME
+
+    while True:
         for frame in frames:
-            draw_frame(canvas, row, column, frame, negative=False)
+            SPACESHIP_FRAME = frame
             await asyncio.sleep(0)
 
-            draw_frame(canvas, row, column, frame, negative=True)
+            SPACESHIP_FRAME = frame
 
 
 async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
