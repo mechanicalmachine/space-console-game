@@ -136,6 +136,11 @@ async def run_spaceship(canvas, start_row, start_column, frames):
         previous_spaceship_frame = SPACESHIP_FRAME
 
         draw_frame(canvas, row, column, SPACESHIP_FRAME, negative=False)
+
+        # add fire coroutine if space pressed
+        if space_pressed:
+            COROUTINES.append(fire(canvas, row, column+2))
+
         await asyncio.sleep(0)
 
         draw_frame(canvas, row, column, previous_spaceship_frame, negative=True)
