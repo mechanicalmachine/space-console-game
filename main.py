@@ -1,6 +1,5 @@
 import os
 import random
-import time
 import curses
 import asyncio
 
@@ -60,7 +59,7 @@ async def async_draw(canvas, canvas_width):
             except StopIteration:
                 COROUTINES.pop(index)
         canvas.refresh()
-        time.sleep(TIC_TIMEOUT)
+        await asyncio.sleep(TIC_TIMEOUT)
 
 
 async def fill_orbit_with_garbage(canvas, garbage_frame, canvas_width):
