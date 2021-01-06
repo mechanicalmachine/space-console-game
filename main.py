@@ -4,6 +4,7 @@ import curses
 import asyncio
 
 from curses_tools import draw_frame, read_controls, get_frame_size
+from explosion import explode
 from obstacles import Obstacle, show_obstacles
 from physics import update_speed
 
@@ -123,6 +124,9 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
             if obstacle.has_collision(row, column):
                 OBSTACLES.pop(index)
                 OBSTACLES_IN_LAST_COLLISIONS.append(obstacle)
+
+                await explode(canvas, row, column)
+
                 return
 
         canvas.addstr(round(row), round(column), symbol)
