@@ -4,12 +4,14 @@ import curses
 import asyncio
 
 from curses_tools import draw_frame, read_controls, get_frame_size
+from obstacles import Obstacle, show_obstacles
 from physics import update_speed
 
 TIC_TIMEOUT = 0.1
 STARS_AMOUNT = 100
 COROUTINES = []
 SPACESHIP_FRAME = ''
+OBSTACLES = []
 
 
 def draw(canvas):
@@ -42,7 +44,12 @@ def draw(canvas):
     COROUTINES.append(fill_orbit_with_garbage(canvas, canvas_width))
 
     loop = asyncio.get_event_loop()
+    # show obstacles
+    loop.create_task(show_obstacles(canvas, OBSTACLES))
+
+    # show all objects except obstacles
     loop.create_task(async_draw(canvas))
+
     loop.run_forever()
 
 
@@ -110,6 +117,12 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
     curses.beep()
 
     while 0 < row < max_row and 0 < column < max_column:
+
+        for index, obstacle in enumerate(OBSTACLES.copy()):
+            if obstacle.has_collision(row, column):
+                OBSTACLES.pop(index)
+                return
+
         canvas.addstr(round(row), round(column), symbol)
         await asyncio.sleep(0)
         canvas.addstr(round(row), round(column), ' ')
@@ -155,7 +168,7 @@ async def animate_spaceship(frames):
 
 
 async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
-    """Animate garbage, flying from top to bottom. Сolumn position will stay the same, as specified on start."""
+    """Animate garbage, flying from top to bottom. Column position will stay the same, as specified on start."""
 
     rows_number, columns_number = canvas.getmaxyx()
 
@@ -164,11 +177,18 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     row = 0
 
+    rows, columns = get_frame_size(garbage_frame)
+
+    current_obstacle = Obstacle(row, column, rows, columns)
+
+    OBSTACLES.append(current_obstacle)
+
     while row < rows_number:
         draw_frame(canvas, row, column, garbage_frame)
         await asyncio.sleep(0)
         draw_frame(canvas, row, column, garbage_frame, negative=True)
         row += speed
+        current_obstacle.row += speed
 
 
 def _get_spaceship_frame(frame_name):

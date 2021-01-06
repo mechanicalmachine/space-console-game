@@ -1,5 +1,6 @@
 import math
 
+
 def _limit(value, min_value, max_value):
     """Limit value by min_value and max_value."""
 
@@ -57,7 +58,6 @@ def update_speed(row_speed, column_speed, rows_direction, columns_direction, row
     
     if fading < 0 or fading > 1:
         raise ValueError(f'Wrong columns_direction value {fading}. Expects float between 0 and 1.')
-        
 
     # гасим скорость, чтобы корабль останавливался со временем
     row_speed *= fading
