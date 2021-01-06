@@ -12,6 +12,7 @@ STARS_AMOUNT = 100
 COROUTINES = []
 SPACESHIP_FRAME = ''
 OBSTACLES = []
+OBSTACLES_IN_LAST_COLLISIONS = []
 
 
 def draw(canvas):
@@ -121,6 +122,7 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
         for index, obstacle in enumerate(OBSTACLES.copy()):
             if obstacle.has_collision(row, column):
                 OBSTACLES.pop(index)
+                OBSTACLES_IN_LAST_COLLISIONS.append(obstacle)
                 return
 
         canvas.addstr(round(row), round(column), symbol)
@@ -184,6 +186,10 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
     OBSTACLES.append(current_obstacle)
 
     while row < rows_number:
+        if current_obstacle in OBSTACLES_IN_LAST_COLLISIONS:
+            OBSTACLES_IN_LAST_COLLISIONS.remove(current_obstacle)
+            return
+
         draw_frame(canvas, row, column, garbage_frame)
         await asyncio.sleep(0)
         draw_frame(canvas, row, column, garbage_frame, negative=True)
