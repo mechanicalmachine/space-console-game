@@ -3,6 +3,7 @@ import random
 import curses
 import asyncio
 
+from animation.game_over import gameover_frame
 from curses_tools import draw_frame, read_controls, get_frame_size
 from explosion import explode
 from obstacles import Obstacle, show_obstacles
@@ -23,6 +24,9 @@ def draw(canvas):
     canvas.border()
     canvas_height, canvas_width = canvas.getmaxyx()
 
+    canvas_vertical_center = canvas_height / 2
+    canvas_horizontal_center = canvas_width / 2
+
     # add stars
     for _ in range(1, STARS_AMOUNT):
         row = random.randint(2, canvas_height-2)
@@ -37,7 +41,9 @@ def draw(canvas):
     for filename in spaceship_frames_filenames:
         spaceship_frame = _get_spaceship_frame(filename)
         spaceship_frames.append(spaceship_frame)
-    COROUTINES.append(run_spaceship(canvas, canvas_height / 2, canvas_width / 2 - 2, spaceship_frames))
+    COROUTINES.append(
+        run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center - 2, spaceship_frames)
+    )
 
     # change spaceship frame
     COROUTINES.append(animate_spaceship(spaceship_frames))
@@ -136,8 +142,8 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
         column += columns_speed
 
 
-async def run_spaceship(canvas, start_row, start_column, frames):
-    row, column = start_row, start_column
+async def run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center, frames):
+    row, column = canvas_vertical_center, canvas_horizontal_center
     frame_rows, frame_columns = get_frame_size(frames[0])
     canvas_rows, canvas_column = canvas.getmaxyx()
     row_speed, column_speed = 0, 0
@@ -160,6 +166,15 @@ async def run_spaceship(canvas, start_row, start_column, frames):
         await asyncio.sleep(0)
 
         draw_frame(canvas, row, column, previous_spaceship_frame, negative=True)
+
+        for index, obstacle in enumerate(OBSTACLES.copy()):
+            # add show_gameover coroutine if spaceship meet garbage
+            if obstacle.has_collision(row, column):
+                COROUTINES.append(
+                    show_gameover(canvas, canvas_vertical_center, canvas_horizontal_center)
+                )
+
+                return
 
 
 async def animate_spaceship(frames):
@@ -208,6 +223,19 @@ def _get_spaceship_frame(frame_name):
 
 def _get_frames_paths(*args):
     return [os.path.join(*args, f) for f in os.listdir(os.path.join(*args)) if os.path.isfile(os.path.join(*args, f))]
+
+
+async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_weight):
+    half_of_gameover_frame_length = len(gameover_frame.split('\n'))/2
+    half_of_gameover_frame_height = len(gameover_frame.split('\n')[1])/2
+    while True:
+        draw_frame(
+            canvas,
+            half_of_canvas_height - half_of_gameover_frame_length,
+            half_of_canvas_weight - half_of_gameover_frame_height,
+            gameover_frame
+        )
+        await asyncio.sleep(0)
 
 
 if __name__ == '__main__':
