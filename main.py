@@ -4,6 +4,7 @@ import curses
 import asyncio
 
 from animation.game_over import gameover_frame
+from animation.garbage import lamp, duck, hubble, trash_large, trash_small, trash_xl
 from curses_tools import draw_frame, read_controls, get_frame_size
 from explosion import explode
 from obstacles import Obstacle, show_obstacles
@@ -73,12 +74,12 @@ async def async_draw(canvas):
 
 
 async def fill_orbit_with_garbage(canvas, canvas_width):
-    garbage_frames_filenames = _get_frames_paths('animation', 'garbage')
     while True:
         rand_garbage_column = random.randint(1, canvas_width - 1)
-        garbage_frame = _get_spaceship_frame(random.choice(garbage_frames_filenames))
-        COROUTINES.append(fly_garbage(canvas, rand_garbage_column, garbage_frame))
-        await asyncio.sleep(0)
+        garbage_frames = (duck, hubble, lamp, trash_large, trash_small, trash_xl)
+        garbage = random.choice(garbage_frames)
+        COROUTINES.append(fly_garbage(canvas, rand_garbage_column, garbage))
+        await sleep(12)
 
 
 async def sleep(tics=1):
