@@ -5,6 +5,7 @@ import asyncio
 
 from animation.game_over import gameover_frame
 from animation.garbage import lamp, duck, hubble, trash_large, trash_small, trash_xl
+from animation.rocket import frame_1, frame_2
 from curses_tools import draw_frame, read_controls, get_frame_size
 from explosion import explode
 from obstacles import Obstacle, show_obstacles
@@ -37,11 +38,7 @@ def draw(canvas):
         COROUTINES.append(blink(canvas, row, column, symbol, delay))
 
     # add spaceship
-    spaceship_frames = []
-    spaceship_frames_filenames = _get_frames_paths('animation', 'rocket')
-    for filename in spaceship_frames_filenames:
-        spaceship_frame = _get_spaceship_frame(filename)
-        spaceship_frames.append(spaceship_frame)
+    spaceship_frames = (frame_1, frame_2)
     COROUTINES.append(
         run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center - 2, spaceship_frames)
     )
