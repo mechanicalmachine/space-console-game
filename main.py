@@ -23,7 +23,6 @@ def draw(canvas):
     global COROUTINES
 
     canvas.nodelay(True)
-    canvas.border()
     canvas_height, canvas_width = canvas.getmaxyx()
 
     canvas_vertical_center = canvas_height / 2
@@ -31,8 +30,8 @@ def draw(canvas):
 
     # add stars
     for _ in range(1, STARS_AMOUNT):
-        row = random.randint(2, canvas_height-2)
-        column = random.randint(2, canvas_width-2)
+        row = random.randint(2, canvas_height - 2)
+        column = random.randint(2, canvas_width - 2)
         symbol = random.choice('+*.:')
         delay = random.randint(1, 10)
         COROUTINES.append(blink(canvas, row, column, symbol, delay))
@@ -67,6 +66,7 @@ async def async_draw(canvas):
             except StopIteration:
                 COROUTINES.pop(index)
         canvas.refresh()
+        canvas.border()
         await asyncio.sleep(TIC_TIMEOUT)
 
 
@@ -192,7 +192,7 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
     rows_number, columns_number = canvas.getmaxyx()
 
     column = max(column, 0)
-    column = min(column, columns_number - 1)
+    column = min(column, columns_number)
 
     row = 0
 
@@ -202,7 +202,7 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     OBSTACLES.append(current_obstacle)
 
-    while row < rows_number:
+    while rows_number - garbage_rows_count:
         if current_obstacle in OBSTACLES_IN_LAST_COLLISIONS:
             OBSTACLES_IN_LAST_COLLISIONS.remove(current_obstacle)
             return
