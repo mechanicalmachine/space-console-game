@@ -52,7 +52,10 @@ def draw(canvas):
     # show all objects except obstacles
     loop.create_task(async_draw(canvas))
 
-    loop.run_forever()
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
 
 
 async def async_draw(canvas):
