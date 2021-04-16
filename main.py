@@ -7,7 +7,7 @@ from animation.garbage import lamp, duck, hubble, trash_large, trash_small, tras
 from animation.rocket import frame_1, frame_2
 from curses_tools import draw_frame, read_controls, get_frame_size
 from explosion import explode
-from obstacles import Obstacle, show_obstacles
+from obstacles import Obstacle
 from physics import update_speed
 
 TIC_TIMEOUT = 0.1
@@ -48,8 +48,6 @@ def draw(canvas):
     COROUTINES.append(fill_orbit_with_garbage(canvas, canvas_width))
 
     loop = asyncio.get_event_loop()
-    # show obstacles
-    loop.create_task(show_obstacles(canvas, OBSTACLES))
 
     # show all objects except obstacles
     loop.create_task(async_draw(canvas))
