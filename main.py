@@ -103,41 +103,39 @@ async def blink(canvas, row, column, symbol, delay):
 async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
     """Display animation of gun shot. Direction and speed can be specified."""
 
-    row, column = start_row, start_column
+    fire_row, fire_column = start_row, start_column
 
-    canvas.addstr(round(row), round(column), '*')
+    canvas.addstr(round(fire_row), round(fire_column), '*')
     await asyncio.sleep(0)
 
-    canvas.addstr(round(row), round(column), 'O')
+    canvas.addstr(round(fire_row), round(fire_column), 'O')
     await asyncio.sleep(0)
-    canvas.addstr(round(row), round(column), ' ')
+    canvas.addstr(round(fire_row), round(fire_column), ' ')
 
-    row += rows_speed
-    column += columns_speed
+    fire_row += rows_speed
+    fire_column += columns_speed
 
     symbol = '-' if columns_speed else '|'
 
     rows, columns = canvas.getmaxyx()
-    max_row, max_column = rows - 1, columns - 1
 
     curses.beep()
 
-    while 0 < row < max_row and 0 < column < max_column:
-
+    while 0 < fire_row < rows:
         for index, obstacle in enumerate(OBSTACLES.copy()):
-            if obstacle.has_collision(row, column):
-                OBSTACLES.pop(index)
+            if obstacle.has_collision(fire_row, fire_column):
+                # OBSTACLES.pop(index)
                 OBSTACLES_IN_LAST_COLLISIONS.append(obstacle)
 
-                await explode(canvas, row, column)
+                await explode(canvas, fire_row, fire_column)
 
                 return
 
-        canvas.addstr(round(row), round(column), symbol)
+        canvas.addstr(round(fire_row), round(fire_column), symbol)
         await asyncio.sleep(0)
-        canvas.addstr(round(row), round(column), ' ')
-        row += rows_speed
-        column += columns_speed
+        canvas.addstr(round(fire_row), round(fire_column), ' ')
+        fire_row += rows_speed
+        fire_column += columns_speed
 
 
 async def run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center, frames):
@@ -196,9 +194,9 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     row = 0
 
-    rows, columns = get_frame_size(garbage_frame)
+    garbage_rows_count, garbage_columns_count = get_frame_size(garbage_frame)
 
-    current_obstacle = Obstacle(row, column, rows, columns)
+    current_obstacle = Obstacle(row, column, garbage_rows_count, garbage_columns_count)
 
     OBSTACLES.append(current_obstacle)
 
@@ -230,7 +228,7 @@ async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_weight):
         draw_frame(
             canvas,
             half_of_canvas_height - half_of_gameover_frame_length,
-            half_of_canvas_weight - half_of_gameover_frame_height,
+            half_of_canvas_width - half_of_gameover_frame_height,
             gameover_frame
         )
         await asyncio.sleep(0)
