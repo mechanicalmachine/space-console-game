@@ -1,4 +1,3 @@
-import os
 import random
 import curses
 import asyncio
@@ -217,8 +216,6 @@ def _get_spaceship_frame(frame_name):
         return frame.read()
 
 
-def _get_frames_paths(*args):
-    return [os.path.join(*args, f) for f in os.listdir(os.path.join(*args)) if os.path.isfile(os.path.join(*args, f))]
 
 
 async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_weight):
