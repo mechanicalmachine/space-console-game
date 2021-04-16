@@ -198,22 +198,19 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     OBSTACLES.append(current_obstacle)
 
-    while rows_number - garbage_rows_count:
-        if current_obstacle in OBSTACLES_IN_LAST_COLLISIONS:
-            OBSTACLES_IN_LAST_COLLISIONS.remove(current_obstacle)
-            return
+    try:
+        while row < rows_number:
+            if current_obstacle in OBSTACLES_IN_LAST_COLLISIONS:
+                OBSTACLES_IN_LAST_COLLISIONS.remove(current_obstacle)
+                return
 
-        draw_frame(canvas, row, column, garbage_frame)
-        await asyncio.sleep(0)
-        draw_frame(canvas, row, column, garbage_frame, negative=True)
-        row += speed
-        current_obstacle.row += speed
-
-
-def _get_spaceship_frame(frame_name):
-    with open(frame_name) as frame:
-        return frame.read()
-
+            draw_frame(canvas, row, column, garbage_frame)
+            await asyncio.sleep(0)
+            draw_frame(canvas, row, column, garbage_frame, negative=True)
+            row += speed
+            current_obstacle.row += speed
+    finally:
+        OBSTACLES.remove(current_obstacle)
 
 
 async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_width):
