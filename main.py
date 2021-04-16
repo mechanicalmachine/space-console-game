@@ -153,7 +153,6 @@ async def run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center
 
         draw_frame(canvas, row, column, SPACESHIP_FRAME, negative=False)
 
-        # add fire coroutine if space pressed
         if space_pressed:
             COROUTINES.append(fire(canvas, row, column+2))
 
@@ -192,9 +191,9 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     row = 0
 
-    garbage_rows_count, garbage_columns_count = get_frame_size(garbage_frame)
+    garbage_rows_takes, garbage_columns_takes = get_frame_size(garbage_frame)
 
-    current_obstacle = Obstacle(row, column, garbage_rows_count, garbage_columns_count)
+    current_obstacle = Obstacle(row, column, garbage_rows_takes, garbage_columns_takes)
 
     OBSTACLES.append(current_obstacle)
 
