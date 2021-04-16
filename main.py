@@ -59,11 +59,11 @@ def draw(canvas):
 
 async def async_draw(canvas):
     while True:
-        for index, coroutine in enumerate(COROUTINES.copy()):
+        for coroutine in COROUTINES.copy():
             try:
                 coroutine.send(None)
             except StopIteration:
-                COROUTINES.pop(index)
+                COROUTINES.remove(coroutine)
         canvas.refresh()
         canvas.border()
         await asyncio.sleep(TIC_TIMEOUT)
@@ -123,7 +123,6 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
     while 0 < fire_row < rows:
         for index, obstacle in enumerate(OBSTACLES.copy()):
             if obstacle.has_collision(fire_row, fire_column):
-                # OBSTACLES.pop(index)
                 OBSTACLES_IN_LAST_COLLISIONS.append(obstacle)
 
                 await explode(canvas, fire_row, fire_column)
