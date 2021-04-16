@@ -216,8 +216,7 @@ def _get_spaceship_frame(frame_name):
 
 
 
-
-async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_weight):
+async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_width):
     half_of_gameover_frame_length = len(gameover_frame.split('\n'))/2
     half_of_gameover_frame_height = len(gameover_frame.split('\n')[1])/2
     while True:
