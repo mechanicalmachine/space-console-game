@@ -250,11 +250,13 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_width):
     half_of_gameover_frame_length = len(gameover_frame.split('\n'))/2
     half_of_gameover_frame_height = len(gameover_frame.split('\n')[1])/2
+    begin_of_gameover_y_coordinate = half_of_canvas_height - half_of_gameover_frame_length
+    begin_of_gameover_x_coordinate = half_of_canvas_width - half_of_gameover_frame_height
     while True:
         draw_frame(
             canvas,
-            half_of_canvas_height - half_of_gameover_frame_length,
-            half_of_canvas_width - half_of_gameover_frame_height,
+            begin_of_gameover_y_coordinate,
+            begin_of_gameover_x_coordinate,
             gameover_frame
         )
         await asyncio.sleep(0)
