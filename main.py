@@ -51,6 +51,12 @@ def draw(canvas):
 
     loop = asyncio.get_event_loop()
 
+    # add year
+    coroutines.append(show_year(canvas, canvas_height, canvas_width))
+
+    # increment year
+    coroutines.append(increment_year())
+
     # show all objects except obstacles
     loop.create_task(async_draw(canvas))
 
@@ -250,6 +256,31 @@ async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_width):
         )
         await asyncio.sleep(0)
 
+
+async def show_year(canvas, canvas_height, canvas_width):
+    year_begin_x_coordinate = canvas_width - 6
+    year_begin_y_coordinate = canvas_height - 2
+    year_lines_takes = 2
+    year_columns_takes = 4
+
+    year_table = canvas.derwin(
+        year_lines_takes,
+        year_columns_takes,
+        year_begin_y_coordinate,
+        year_begin_x_coordinate
+    )
+
+    while True:
+        year_table.insstr(str(year))
+        await asyncio.sleep(0)
+
+
+async def increment_year():
+    tics_number_in_year = 15
+    while True:
+        await sleep(tics_number_in_year)
+        global year
+        year += 1
 
 if __name__ == '__main__':
     curses.update_lines_cols()
