@@ -221,27 +221,27 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     rows_number, columns_number = canvas.getmaxyx()
 
-    column = max(column, 0)
-    column = min(column, columns_number)
-
-    row = 0
+    garbage_current_row = 0
 
     garbage_rows_takes, garbage_columns_takes = get_frame_size(garbage_frame)
 
-    current_obstacle = Obstacle(row, column, garbage_rows_takes, garbage_columns_takes)
+    column = max(column, 0)
+    garbage_current_column = min(column, columns_number - garbage_columns_takes)
+
+    current_obstacle = Obstacle(garbage_current_row, garbage_current_column, garbage_rows_takes, garbage_columns_takes)
 
     obstacles.append(current_obstacle)
 
     try:
-        while row < rows_number:
+        while garbage_current_row < rows_number:
             if current_obstacle in obstacles_in_last_collisions:
                 obstacles_in_last_collisions.remove(current_obstacle)
                 return
 
-            draw_frame(canvas, row, column, garbage_frame)
+            draw_frame(canvas, garbage_current_row, garbage_current_column, garbage_frame)
             await asyncio.sleep(0)
-            draw_frame(canvas, row, column, garbage_frame, negative=True)
-            row += speed
+            draw_frame(canvas, garbage_current_row, garbage_current_column, garbage_frame, negative=True)
+            garbage_current_row += speed
             current_obstacle.row += speed
     finally:
         obstacles.remove(current_obstacle)
