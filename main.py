@@ -40,7 +40,7 @@ def draw(canvas):
     # add spaceship
     spaceship_frames = (frame_1, frame_2)
     coroutines.append(
-        run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center - 2, spaceship_frames)
+        run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center, spaceship_frames)
     )
 
     # change spaceship frame
@@ -49,13 +49,16 @@ def draw(canvas):
     # add garbage
     coroutines.append(fill_orbit_with_garbage(canvas, canvas_width))
 
-    loop = asyncio.get_event_loop()
-
     # add year
     coroutines.append(show_year(canvas, canvas_height, canvas_width))
 
+    # add phrase about historical event
+    coroutines.append(show_historical_phrase(canvas, canvas_width, canvas_height))
+
     # increment year
     coroutines.append(increment_year())
+
+    loop = asyncio.get_event_loop()
 
     # show all objects except obstacles
     loop.create_task(async_draw(canvas))
@@ -281,6 +284,35 @@ async def increment_year():
         await sleep(tics_number_in_year)
         global year
         year += 1
+
+
+async def show_historical_phrase(canvas, canvas_width, canvas_height):
+    phrase_vertical_coordinate = round(canvas_height / 4)
+
+    PHRASES = {
+        1957: 'First Sputnik',
+        1961: 'Gagarin flew!',
+        1969: 'Armstrong got on the moon!',
+        1971: 'First orbital space station Salute-1',
+        1981: 'Flight of the Shuttle Columbia',
+        1998: 'ISS start building',
+        2011: 'Messenger launch to Mercury',
+        2020: 'Take the plasma gun! Shoot the garbage!',
+    }
+
+    while True:
+        current_phrase = PHRASES.get(year, '')
+        phrase_length = len(current_phrase)
+        phrase_horizontal_coordinate = round((canvas_width - phrase_length) / 2)
+
+        for index, letter in enumerate(current_phrase):
+            letter_position = phrase_horizontal_coordinate + index
+            canvas.addch(phrase_vertical_coordinate, letter_position, letter)
+        await asyncio.sleep(0)
+        for index, _ in enumerate(current_phrase):
+            letter_position = phrase_horizontal_coordinate + index
+            canvas.addch(phrase_vertical_coordinate, letter_position, ' ')
+
 
 if __name__ == '__main__':
     curses.update_lines_cols()
