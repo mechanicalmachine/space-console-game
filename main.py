@@ -12,15 +12,16 @@ from physics import update_speed
 
 TIC_TIMEOUT = 0.1
 STARS_AMOUNT = 100
-COROUTINES = []
-SPACESHIP_FRAME = ''
-OBSTACLES = []
-OBSTACLES_IN_LAST_COLLISIONS = []
+
+coroutines = []
+spaceship_frame = ''
+obstacles = []
+obstacles_in_last_collisions = []
 year = 1957
 
 
 def draw(canvas):
-    global COROUTINES
+    global coroutines
 
     canvas.nodelay(True)
     canvas_height, canvas_width = canvas.getmaxyx()
@@ -34,19 +35,19 @@ def draw(canvas):
         column = random.randint(2, canvas_width - 2)
         symbol = random.choice('+*.:')
         delay = random.randint(1, 10)
-        COROUTINES.append(blink(canvas, row, column, symbol, delay))
+        coroutines.append(blink(canvas, row, column, symbol, delay))
 
     # add spaceship
     spaceship_frames = (frame_1, frame_2)
-    COROUTINES.append(
+    coroutines.append(
         run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center - 2, spaceship_frames)
     )
 
     # change spaceship frame
-    COROUTINES.append(animate_spaceship(spaceship_frames))
+    coroutines.append(animate_spaceship(spaceship_frames))
 
     # add garbage
-    COROUTINES.append(fill_orbit_with_garbage(canvas, canvas_width))
+    coroutines.append(fill_orbit_with_garbage(canvas, canvas_width))
 
     loop = asyncio.get_event_loop()
 
@@ -61,11 +62,11 @@ def draw(canvas):
 
 async def async_draw(canvas):
     while True:
-        for coroutine in COROUTINES.copy():
+        for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
             except StopIteration:
-                COROUTINES.remove(coroutine)
+                coroutines.remove(coroutine)
         canvas.refresh()
         canvas.border()
         await asyncio.sleep(TIC_TIMEOUT)
@@ -95,7 +96,7 @@ async def fill_orbit_with_garbage(canvas, canvas_width):
             rand_garbage_column = random.randint(1, canvas_width - 1)
             garbage_frames = (duck, hubble, lamp, trash_large, trash_small, trash_xl)
             garbage = random.choice(garbage_frames)
-            COROUTINES.append(fly_garbage(canvas, rand_garbage_column, garbage))
+            coroutines.append(fly_garbage(canvas, rand_garbage_column, garbage))
             await sleep(garbage_delay_tics)
         else:
             await asyncio.sleep(0)
@@ -144,9 +145,9 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
     curses.beep()
 
     while 0 < fire_row < rows:
-        for index, obstacle in enumerate(OBSTACLES.copy()):
+        for index, obstacle in enumerate(obstacles.copy()):
             if obstacle.has_collision(fire_row, fire_column):
-                OBSTACLES_IN_LAST_COLLISIONS.append(obstacle)
+                obstacles_in_last_collisions.append(obstacle)
 
                 await explode(canvas, fire_row, fire_column)
 
@@ -172,23 +173,23 @@ async def run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center
         row = max(1, min(row + row_speed, canvas_rows - frame_rows - 1))
         column = max(1, min(column + column_speed, canvas_column - frame_columns - 1))
 
-        previous_spaceship_frame = SPACESHIP_FRAME
+        previous_spaceship_frame = spaceship_frame
 
-        draw_frame(canvas, row, column, SPACESHIP_FRAME, negative=False)
+        draw_frame(canvas, row, column, spaceship_frame, negative=False)
 
         plasma_gun_activation_year = 2020
 
         if year > plasma_gun_activation_year and space_pressed:
-            COROUTINES.append(fire(canvas, row, column+2))
+            coroutines.append(fire(canvas, row, column + 2))
 
         await asyncio.sleep(0)
 
         draw_frame(canvas, row, column, previous_spaceship_frame, negative=True)
 
-        for index, obstacle in enumerate(OBSTACLES.copy()):
+        for index, obstacle in enumerate(obstacles.copy()):
             # add show_gameover coroutine if spaceship meet garbage
             if obstacle.has_collision(row, column):
-                COROUTINES.append(
+                coroutines.append(
                     show_gameover(canvas, canvas_vertical_center, canvas_horizontal_center)
                 )
 
@@ -196,14 +197,14 @@ async def run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center
 
 
 async def animate_spaceship(frames):
-    global SPACESHIP_FRAME
+    global spaceship_frame
 
     while True:
         for frame in frames:
-            SPACESHIP_FRAME = frame
+            spaceship_frame = frame
             await asyncio.sleep(0)
 
-            SPACESHIP_FRAME = frame
+            spaceship_frame = frame
 
 
 async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
@@ -220,12 +221,12 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     current_obstacle = Obstacle(row, column, garbage_rows_takes, garbage_columns_takes)
 
-    OBSTACLES.append(current_obstacle)
+    obstacles.append(current_obstacle)
 
     try:
         while row < rows_number:
-            if current_obstacle in OBSTACLES_IN_LAST_COLLISIONS:
-                OBSTACLES_IN_LAST_COLLISIONS.remove(current_obstacle)
+            if current_obstacle in obstacles_in_last_collisions:
+                obstacles_in_last_collisions.remove(current_obstacle)
                 return
 
             draw_frame(canvas, row, column, garbage_frame)
@@ -234,7 +235,7 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
             row += speed
             current_obstacle.row += speed
     finally:
-        OBSTACLES.remove(current_obstacle)
+        obstacles.remove(current_obstacle)
 
 
 async def show_gameover(canvas, half_of_canvas_height, half_of_canvas_width):
