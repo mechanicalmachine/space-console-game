@@ -82,6 +82,7 @@ async def async_draw(canvas):
 
 
 def get_garbage_delay_tics():
+    """NOTE: year is a global variable"""
     if year < 1961:
         return None
     elif year < 1969:
