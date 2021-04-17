@@ -176,7 +176,9 @@ async def run_spaceship(canvas, canvas_vertical_center, canvas_horizontal_center
 
         draw_frame(canvas, row, column, SPACESHIP_FRAME, negative=False)
 
-        if space_pressed:
+        plasma_gun_activation_year = 2020
+
+        if year > plasma_gun_activation_year and space_pressed:
             COROUTINES.append(fire(canvas, row, column+2))
 
         await asyncio.sleep(0)
