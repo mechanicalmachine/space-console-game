@@ -16,6 +16,7 @@ COROUTINES = []
 SPACESHIP_FRAME = ''
 OBSTACLES = []
 OBSTACLES_IN_LAST_COLLISIONS = []
+year = 1957
 
 
 def draw(canvas):
@@ -70,13 +71,34 @@ async def async_draw(canvas):
         await asyncio.sleep(TIC_TIMEOUT)
 
 
+def get_garbage_delay_tics():
+    if year < 1961:
+        return None
+    elif year < 1969:
+        return 20
+    elif year < 1981:
+        return 14
+    elif year < 1995:
+        return 10
+    elif year < 2010:
+        return 8
+    elif year < 2020:
+        return 6
+    else:
+        return 2
+
+
 async def fill_orbit_with_garbage(canvas, canvas_width):
     while True:
-        rand_garbage_column = random.randint(1, canvas_width - 1)
-        garbage_frames = (duck, hubble, lamp, trash_large, trash_small, trash_xl)
-        garbage = random.choice(garbage_frames)
-        COROUTINES.append(fly_garbage(canvas, rand_garbage_column, garbage))
-        await sleep(12)
+        garbage_delay_tics = get_garbage_delay_tics()
+        if garbage_delay_tics:
+            rand_garbage_column = random.randint(1, canvas_width - 1)
+            garbage_frames = (duck, hubble, lamp, trash_large, trash_small, trash_xl)
+            garbage = random.choice(garbage_frames)
+            COROUTINES.append(fly_garbage(canvas, rand_garbage_column, garbage))
+            await sleep(garbage_delay_tics)
+        else:
+            await asyncio.sleep(0)
 
 
 async def sleep(tics=1):
